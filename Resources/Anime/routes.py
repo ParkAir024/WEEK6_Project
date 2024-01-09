@@ -21,9 +21,9 @@ class Post(MethodView):
   @bp.arguments(PostSchema)
   def put(self, anime_data ,anime_id):
     try:
-      post = posts[post_id]
+      anime = animes[anime_id]
       if anime_data['user_id'] == anime['user_id']:
-        anime['body'] = anime_data['body']
+        anime['title'] = anime_data['title']
         return { 'message': 'Post Updated' }, 202
       return {'message': "Unauthorized"}, 401
     except:
@@ -44,7 +44,7 @@ class PostList(MethodView):
     return  list(animes.values())
   
   @bp.arguments(PostSchema)
-  def post(self, post_data):
+  def post(self, anime_data):
     user_id = anime_data['user_id']
     if user_id in users:
       animes[uuid4()] = anime_data
