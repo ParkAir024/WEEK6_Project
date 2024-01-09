@@ -1,15 +1,18 @@
 users = {
     '1': {
         'username': 'goku',
-        'email' : 'goku@capsule.com'
+        'email' : 'goku@capsule.com',
+        'password' : "SSJ4"
     },
     '2' : {
         'username' : 'tanjiroK',
-        'email' : 'ktanjiro@corp.com'
+        'email' : 'ktanjiro@corp.com',
+        'password' : "Nezzy2"
     },
     '3' : {
         'username' : 'allmightjr',
-        'email' : 'deku@ua.com'
+        'email' : 'deku@ua.com',
+        'password': "number1"
     }
 }
 
