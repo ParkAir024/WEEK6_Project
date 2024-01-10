@@ -15,7 +15,7 @@ class UserLogin(Schema):
 class PostSchema(Schema):
   id = fields.Str(dump_only = True)
   body = fields.Str(required = True)
-  timestamp = fields.DateTime(dump_only = True)
+  timestamp = fields.Str(dump_only = True)
 
 class PostSchemaNested(PostSchema):
   user = fields.Nested(UserSchema, dump_only = True)
