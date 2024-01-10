@@ -1,9 +1,11 @@
 from flask import request
 from uuid import uuid4
 from flask.views import MethodView
+from flask_smorest import abort
+from marshmallow import post_dump
 
-from schemas import PostSchema
-from db import animes, users
+from models import AnimeModel
+from schemas import PostSchema, PostSchemaNested
 from . import bp
 
 # Anime routes
@@ -11,42 +13,44 @@ from . import bp
 @bp.route('/<anime_id>')
 class Post(MethodView):
 
-  @bp.response(200, PostSchema)
+  @bp.response(200, PostSchemaNested)
   def get(self, anime_id):
-    try:
-      return animes[anime_id]
-    except KeyError:
-      return {'message': "Invalid Post"}, 400
+    post = AnimeModel.query.get(anime_id)
+    if post:
+      print(post.author)
+      return post 
+    abort(400, message='Invalid POst')
 
   @bp.arguments(PostSchema)
   def put(self, anime_data ,anime_id):
-    try:
-      anime = animes[anime_id]
-      if anime_data['user_id'] == anime['user_id']:
-        anime['title'] = anime_data['title']
-        return { 'message': 'Post Updated' }, 202
-      return {'message': "Unauthorized"}, 401
-    except:
-      return {'message': "Invalid Post Id"}, 400
+    post = AnimeModel.query.get(anime_id)
+    if post:
+      post.body = anime_data['body']
+      post.commit()
+      return {'message': 'anime updated'}, 201
+    return {'message': "Invalid Post Id"}, 400
 
   def delete(self, anime_id):
-    try:
-      del animes[anime_id]
+    post = AnimeModel.query.get(anime_id)
+    if post:
+      post.delete()
       return {"message": "Post Deleted"}, 202
-    except:
-      return {'message':"Invalid Post"}, 400
+    return {'message':"Invalid Post"}, 400
 
 @bp.route('/')
 class PostList(MethodView):
 
   @bp.response(200, PostSchema(many = True))
   def get(self):
-    return  list(animes.values())
+    return AnimeModel.query.all()
   
   @bp.arguments(PostSchema)
   def post(self, anime_data):
-    user_id = anime_data['user_id']
-    if user_id in users:
-      animes[uuid4()] = anime_data
+    try:
+      post = AnimeModel()
+      post.user_id = anime_data['user_id']
+      post.body = anime_data['body']
+      post.commit()
       return { 'message': "Post Created" }, 201
-    return { 'message': "Invalid User"}, 401
+    except:
+      return { 'message': "Invalid User"}, 401

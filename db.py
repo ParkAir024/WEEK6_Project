@@ -18,15 +18,15 @@ users = {
 
 animes = {
     '1' : {
-        'title' : 'My Hero Acadamia',
+        'body' : 'My Hero Acadamia',
         'user_id' : '3'
     },
     '2' : {
-        'title' : 'DragonBall Z',
+        'body' : 'DragonBall Z',
         'user_id' : '1'
     },
     '3' : {
-        'title' : 'Demon Slayer',
+        'body' : 'Demon Slayer',
         'user_id' : '2'
     }
 }
