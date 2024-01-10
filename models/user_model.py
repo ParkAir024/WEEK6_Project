@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from app import db
 
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -7,7 +8,6 @@ followers = db.Table( 'followers',
   db.Column('follower_id', db.Integer, db.ForeignKey('users.id')),
   db.Column('followed_id', db.Integer, db.ForeignKey('users.id'))  
 )
-
 
 class UserModel(db.Model):
 
@@ -25,7 +25,7 @@ class UserModel(db.Model):
                             secondaryjoin = followers.c.followed_id == id,
                             backref = db.backref('followers', lazy = 'dynamic')
                             )
-  # posts = db.relationship(PostModel, backref='author', lazy='dynamic', cascade= 'all, delete')
+  posts = db.relationship('AnimeModel',back_populates ='user', lazy='dynamic', cascade= 'all, delete')
   
   def __repr__(self):
     return f'<User: {self.username}>'
@@ -46,8 +46,21 @@ class UserModel(db.Model):
         setattr(self, 'password_hash', generate_password_hash(v))
         # self.password_hash = v
 
+  def check_password(self, password):
+    return check_password_hash(self.password_hash, password)
 
+  def is_following(self, user):
+    return user in self.followed
+  
+  def follow(self, user):
+    if self.is_following(user):
+      return
+    self.followed.append(user)
 
+  def unfollow(self,user):
+    if not self.is_following(user):
+      return
+    self.followed.remove(user)
 
 class AnimeModel(db.Model):
 
@@ -55,9 +68,9 @@ class AnimeModel(db.Model):
 
   id = db.Column(db.Integer, primary_key = True)
   body = db.Column(db.String, nullable = False)
-  timestamp = db.Column(db.String)
+  timestamp = db.Column(db.DateTime, default = datetime.utcnow)
   user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable = False)
-  # user = db.relationship(UserModel, back_populates = 'posts')
+  user = db.relationship('UserModel', back_populates = 'posts')
 
 
   def __repr__(self):
