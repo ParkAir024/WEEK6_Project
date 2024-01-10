@@ -17,8 +17,8 @@ jwt = JWTManager(app)
 from models.user_model import UserModel
 from models import AnimeModel, UserModel
 
-from Resources.user import bp as user_bp
+from Resources.User import bp as user_bp
 api.register_blueprint(user_bp)
 
-from Resources.anime import bp as anime_bp
+from Resources.Anime import bp as anime_bp
 api.register_blueprint(anime_bp)
