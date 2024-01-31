@@ -6,7 +6,7 @@ from flask_smorest import abort
 from . import bp
 
 from schemas import UserSchema, UserSchemaNested
-from models.user_model import UserModel
+from models import UserModel
 # user routes
 
 @bp.route('/user/<user_id>')
@@ -14,9 +14,12 @@ class User(MethodView):
 
   @bp.response(200, UserSchemaNested)
   def get(self,user_id):
+    if user_id.is_digit():
+      user= None
     user = UserModel.query.get(user_id)
+    if not user:
+      user = UserModel.query.filter_by(username = user_id).first()
     if user:
-      print(user.posts.all())
       return user
     else:
       abort(400, message='User not found')
@@ -45,16 +48,6 @@ class UserList(MethodView):
   @bp.response(200, UserSchema(many = True))
   def get(self):
    return UserModel.query.all()
-  
-  @bp.arguments(UserSchema)
-  def post(self, user_data):
-    try: 
-      user = UserModel()
-      user.from_dict(user_data)
-      user.commit()
-      return { 'message' : f'{user_data["username"]} created' }, 201
-    except:
-      abort(400, message='Username and Email Already taken')
       
 @bp.route('/user/follow/<followed_id>')
 class FollowUser(MethodView):
@@ -69,6 +62,7 @@ class FollowUser(MethodView):
       return {'message':'user followed'}
     else:
       return {'message':'invalid user'}, 400
+    
   @jwt_required()  
   def put(self, followed_id):
     followed = UserModel.query.get(followed_id)

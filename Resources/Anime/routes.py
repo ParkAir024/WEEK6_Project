@@ -41,7 +41,7 @@ class Post(MethodView):
 @bp.route('/')
 class PostList(MethodView):
 
-  @bp.response(200, PostSchema(many = True))
+  @bp.response(200, PostSchemaNested(many = True))
   def get(self):
     return AnimeModel.query.all()
   
