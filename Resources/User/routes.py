@@ -9,12 +9,12 @@ from schemas import UserSchema, UserSchemaNested
 from models import UserModel
 # user routes
 
-@bp.route('/user/<user_id>')
+@bp.route('/user/<user_id_or_username>')
 class User(MethodView):
 
   @bp.response(200, UserSchemaNested)
   def get(self,user_id):
-    if user_id.is_digit():
+    if user_id.isdigit():
       user= None
     user = UserModel.query.get(user_id)
     if not user:

@@ -7,6 +7,7 @@ class UserSchema(Schema):
   password = fields.Str(required = True, load_only = True )
   first_name = fields.Str()
   last_name = fields.Str()
+  token = fields.Str( dump_only= True)
 
 class UserLogin(Schema):
   username = fields.Str(required = True)
