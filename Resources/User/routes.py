@@ -11,36 +11,35 @@ from models import UserModel
 
 @bp.route('/user/<user_id_or_username>')
 class User(MethodView):
+    @bp.response(200, UserSchemaNested)
+    def get(self, user_id_or_username):
+        user = None
+        if user_id_or_username.isdigit():  # Check if user_id_or_username is an integer
+            user = UserModel.query.get(user_id_or_username)
+        else:
+            user = UserModel.query.filter_by(username=user_id_or_username).first()
+        if user:
+            return user
+        else:
+            abort(400, message='User not found')
 
-  @bp.response(200, UserSchemaNested)
-  def get(self,user_id):
-    if user_id.isdigit():
-      user= None
-    user = UserModel.query.get(user_id)
-    if not user:
-      user = UserModel.query.filter_by(username = user_id).first()
-    if user:
-      return user
-    else:
-      abort(400, message='User not found')
+    @jwt_required()  
+    @bp.arguments(UserSchema)
+    def put(self, user_data, user_id_or_username):
+        user = UserModel.query.get(get_jwt_identity())
+        if user and user.id == user_id_or_username:
+            user.from_dict(user_data)
+            user.commit()
+            return { 'message': f'{user.username} updated'}, 202
+        abort(400, message="Invalid User")
 
-  @jwt_required()  
-  @bp.arguments(UserSchema)
-  def put(self, user_data, user_id):
-    user = UserModel.query.get(get_jwt_identity())
-    if user and user.id == user_id:
-      user.from_dict(user_data)
-      user.commit()
-      return { 'message': f'{user.username} updated'}, 202
-    abort(400, message = "Invalid User")
-
-  @jwt_required()
-  def delete(self, user_id):
-    user = UserModel.query.get(get_jwt_identity())
-    if user == user_id:
-      user.delete()
-      return { 'message': f'User: {user.username} Deleted' }, 202
-    return {'message': "Invalid username"}, 400
+    @jwt_required()
+    def delete(self, user_id_or_username):
+        user = UserModel.query.get(get_jwt_identity())
+        if user == user_id_or_username:
+            user.delete()
+            return { 'message': f'User: {user.username} Deleted' }, 202
+        return {'message': "Invalid username"}, 400
 
 @bp.route('/user')
 class UserList(MethodView):
