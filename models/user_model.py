@@ -25,7 +25,7 @@ class UserModel(db.Model):
                             secondaryjoin = followers.c.followed_id == id,
                             backref = db.backref('followers', lazy = 'dynamic')
                             )
-  posts = db.relationship('AnimeModel',back_populates ='user', lazy='dynamic', cascade= 'all, delete')
+  animes = db.relationship('AnimeModel',back_populates ='user', lazy='dynamic', cascade= 'all, delete')
   
   def __repr__(self):
     return f'<User: {self.username}>'
@@ -66,14 +66,17 @@ class AnimeModel(db.Model):
   __tablename__ = 'anime'
 
   id = db.Column(db.Integer, primary_key = True)
-  body = db.Column(db.String, nullable = False)
+  title = db.Column(db.String, nullable=True)
+  plot = db.Column(db.String, nullable = False)
+  genre = db.Column(db.String, nullable = False)
+  rating = db.Column(db.String, nullable = False)
   timestamp = db.Column(db.DateTime, default = datetime.utcnow)
   user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable = False)
-  user = db.relationship('UserModel', back_populates = 'posts')
+  user = db.relationship('UserModel', back_populates = 'animes')
 
 
   def __repr__(self):
-    return f'<Post: {self.body}>'
+    return f'<Anime: {self.plot}>'
   
   def commit(self):
     db.session.add(self)

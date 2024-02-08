@@ -15,7 +15,10 @@ class UserLogin(Schema):
 
 class PostSchema(Schema):
   id = fields.Str(dump_only = True)
-  body = fields.Str(required = True)
+  title = fields.Str(required = True)
+  plot = fields.Str(required = True)
+  genre = fields.Str(required= True)
+  rating = fields.Str(required=True)
   timestamp = fields.Str(dump_only = True)
 
 class PostSchemaNested(PostSchema):

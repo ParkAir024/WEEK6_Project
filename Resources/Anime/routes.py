@@ -25,9 +25,12 @@ class Post(MethodView):
   def put(self, post_data, post_id):
     post = AnimeModel.query.get(post_id)
     if post and post.user_id == get_jwt_identity():
-      post.body = post_data['body']
+      post.title = post_data['title']
+      post.plot = post_data['plot']
+      post.genre = post_data.get('genre')
+      post.rating = post_data.get('rating')
       post.commit()   
-      return {'message': 'post updated'}, 201
+      return {'message': 'List updated'}, 201
     return {'message': "Invalid Post Id"}, 400
     
   @jwt_required()
@@ -51,7 +54,10 @@ class PostList(MethodView):
     try:
       post = AnimeModel()
       post.user_id = get_jwt_identity() 
-      post.body = post_data['body']
+      post.title = post_data['title']
+      post.plot = post_data['plot']
+      post.genre = post_data['genre']
+      post.rating = post_data['rating']
       post.commit()
       return { 'message': "Post Created" }, 201
     except:
